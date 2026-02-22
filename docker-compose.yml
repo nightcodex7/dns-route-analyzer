@@ -1,18 +1,21 @@
 services:
   backend:
-    build: ./backend
+    # build: ./backend
+    image: nightcodex/dns-route-analyzer:backend
     ports:
       - "5000:5000"
     depends_on:
       - ai-agent
 
   ai-agent:
-    build: ./ai-agent
+    # build: ./ai-agent
+    image: nightcodex/dns-route-analyzer:ai-agent
     ports:
       - "5001:5001"
 
   frontend:
-    build: ./frontend
+    # build: ./frontend
+    image: nightcodex/dns-route-analyzer:frontend
     ports:
       - "3000:80"
     depends_on:
