@@ -1,32 +1,417 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>DNS Checker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS & Traceroute Analyzer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-glow: rgba(99, 102, 241, 0.5);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(255, 255, 255, 0.15);
+            --input-focus: #818cf8;
+            --terminal-bg: #020617;
+            --terminal-text: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .controls-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 640px) {
+            .controls-group {
+                grid-template-columns: 2fr 1fr;
+            }
+
+            .full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-wrapper label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            outline: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2em;
+            padding-right: 2.5rem;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+        }
+
+        input::placeholder {
+            color: #475569;
+        }
+
+        option {
+            background: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        .btn-check {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px 0 var(--accent-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.6);
+            background: linear-gradient(135deg, var(--accent-hover) 0%, #7c3aed 100%);
+        }
+
+        .btn-check:active {
+            transform: translateY(0);
+        }
+
+        .btn-check:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .terminal-wrapper {
+            margin-top: 2rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--terminal-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: rgba(30, 41, 59, 0.9);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            gap: 0.5rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #ef4444;
+        }
+
+        .dot-yellow {
+            background: #f59e0b;
+        }
+
+        .dot-green {
+            background: #10b981;
+        }
+
+        .terminal-title {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        #output {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--terminal-text);
+            padding: 1.5rem;
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        /* Custom Scrollbar for Terminal */
+        #output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #output::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #output::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        #output::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Utility class for hiding elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading animation inside output */
+        .loading {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: bottom;
+            animation: ellipsis steps(4, end) 1.5s infinite;
+        }
+
+        @keyframes ellipsis {
+            to {
+                width: 1.25em;
+            }
+        }
+
+        @keyframes spinner {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner-icon {
+            transform-origin: center;
+            animation: spinner 0.75s infinite linear;
+        }
+    </style>
 </head>
 
 <body>
-    <h2>DNS + Traceroute Checker</h2>
+    <div class="container">
+        <div class="header">
+            <h2>Traffic Analyzer</h2>
+            <p>DNS Analysis & Traceroute Utility</p>
+        </div>
 
-    <input id="domain" placeholder="example.com">
+        <div class="controls-group">
+            <div class="input-wrapper full-width">
+                <label for="domain">Target Domain</label>
+                <input id="domain" type="text" placeholder="e.g., example.com" autocomplete="off" spellcheck="false">
+            </div>
 
-    <select id="resolver" onchange="toggleCustomDNS()"> <!-- added -->
-        <option value="1.1.1.1">Cloudflare (1.1.1.1)</option> <!-- modified -->
-        <option value="8.8.8.8">Google (8.8.8.8)</option> <!-- modified -->
-        <option value="9.9.9.9">Quad9 (9.9.9.9)</option> <!-- modified -->
-        <option value="94.140.14.14">AdGuard (94.140.14.14)</option> <!-- added -->
-        <option value="76.76.2.0">ControlD (76.76.2.0)</option> <!-- added -->
-        <option value="45.90.28.0">NextDNS (45.90.28.0)</option> <!-- added -->
-        <option value="custom">Custom DNS</option> <!-- added -->
-    </select>
+            <div class="input-wrapper">
+                <label for="resolver">DNS Resolver</label>
+                <select id="resolver" onchange="toggleCustomDNS()">
+                    <option value="1.1.1.1">Cloudflare (1.1.1.1)</option>
+                    <option value="8.8.8.8">Google (8.8.8.8)</option>
+                    <option value="9.9.9.9">Quad9 (9.9.9.9)</option>
+                    <option value="76.76.2.0">ControlD (76.76.2.0)</option>
+                    <option value="94.140.14.14">AdGuard (94.140.14.14)</option>
+                    <option value="45.90.28.0">NextDNS General(45.90.28.0)</option>
+                    <option value="custom">Custom DNS</option>
+                </select>
+            </div>
 
-    <input id="customDNS" placeholder="Enter custom DNS IP" style="display:none;"> <!-- added -->
+            <div class="input-wrapper hidden" id="customDNSWrapper">
+                <label for="customDNS">Custom IP Address</label>
+                <input id="customDNS" type="text" placeholder="e.g., 192.168.1.1" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
 
-    <button onclick="runCheck()">Check</button>
+        <button class="btn-check" onclick="runCheck()" id="checkBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 16 16 12 12 8"></polyline>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Analyze Traffic
+        </button>
 
-    <pre id="output"></pre>
+        <div class="terminal-wrapper">
+            <div class="terminal-header">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+                <span class="terminal-title">analyzer@docker:~$</span>
+            </div>
+            <pre id="output">Waiting for input...</pre>
+        </div>
+    </div>
 
+    <!-- Include external script while extending its behaviors locally -->
     <script src="script.js"></script>
+    <script>
+        // Update the toggleCustomDNS behavior to work with the new wrapper design
+        window.toggleCustomDNS = function () {
+            const resolver = document.getElementById("resolver").value;
+            const customWrapper = document.getElementById("customDNSWrapper");
+
+            if (resolver === "custom") {
+                customWrapper.classList.remove("hidden");
+                // Focus the custom input for better UX
+                setTimeout(() => document.getElementById("customDNS").focus(), 50);
+            } else {
+                customWrapper.classList.add("hidden");
+            }
+        };
+
+        // Make button show loading state visually using an intercept on runCheck
+        const originalRunCheck = window.runCheck;
+        window.runCheck = async function () {
+            const btn = document.getElementById("checkBtn");
+            const output = document.getElementById("output");
+            const domain = document.getElementById("domain").value;
+
+            if (!domain) {
+                output.style.color = "#ef4444";
+                output.textContent = "Error: Please enter a target domain first.";
+                return;
+            }
+
+            // Visual loading state
+            btn.disabled = true;
+            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z" class="spinner-icon" fill="currentColor"/></svg> Analyzing...`;
+
+            output.style.color = "var(--terminal-text)";
+            output.innerHTML = `Analyzing traffic for ${domain}<span class="loading">...</span>`;
+
+            try {
+                // Call original logic from script.js
+                await originalRunCheck();
+            } catch (err) {
+                output.style.color = "#ef4444";
+                output.textContent = "Error: Failed to connect to analysis server\n" + err.message;
+            } finally {
+                // Reset button
+                btn.disabled = false;
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg> Analyze Traffic`;
+            }
+        };
+    </script>
 </body>
 
 </html>
