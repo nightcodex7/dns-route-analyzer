@@ -9,11 +9,19 @@
     <h2>DNS + Traceroute Checker</h2>
 
     <input id="domain" placeholder="example.com">
-    <select id="resolver">
-        <option value="1.1.1.1">Cloudflare</option>
-        <option value="8.8.8.8">Google</option>
-        <option value="9.9.9.9">Quad9</option>
+
+    <select id="resolver" onchange="toggleCustomDNS()"> <!-- added -->
+        <option value="1.1.1.1">Cloudflare (1.1.1.1)</option> <!-- modified -->
+        <option value="8.8.8.8">Google (8.8.8.8)</option> <!-- modified -->
+        <option value="9.9.9.9">Quad9 (9.9.9.9)</option> <!-- modified -->
+        <option value="94.140.14.14">AdGuard (94.140.14.14)</option> <!-- added -->
+        <option value="76.76.2.0">ControlD (76.76.2.0)</option> <!-- added -->
+        <option value="45.90.28.0">NextDNS (45.90.28.0)</option> <!-- added -->
+        <option value="custom">Custom DNS</option> <!-- added -->
     </select>
+
+    <input id="customDNS" placeholder="Enter custom DNS IP" style="display:none;"> <!-- added -->
+
     <button onclick="runCheck()">Check</button>
 
     <pre id="output"></pre>
