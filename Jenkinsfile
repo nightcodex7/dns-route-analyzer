@@ -63,21 +63,22 @@ pipeline {
         }
 
         // For Old Docker Compose Deployment
-        // stage("Deploy with Docker Compose") {
-        //     steps {
-        //         sh """
-        //             docker-compose down || true
-        //             docker-compose up -d
-        //         """
-        //     }
-        // }
-
-        stage("Deploy to Docker Swarm") {
+        stage("Deploy with Docker Compose") {
             steps {
                 sh """
-                    docker stack deploy -c docker-compose.yml dnsstack
+                    docker-compose down || true
+                    docker-compose up -d
                 """
             }
         }
+
+        // For Docker Swarm Deployment
+        // stage("Deploy to Docker Swarm") {
+        //     steps {
+        //         sh """
+        //             docker stack deploy -c docker-compose.yml dnsstack
+        //         """
+        //     }
+        // }
     }
 }
