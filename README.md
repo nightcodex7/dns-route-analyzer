@@ -30,4 +30,10 @@ To start the application, simply run:
 docker-compose up
 ```
 
+To check and stop swarm containers:
+```bash
+docker service ls
+docker update --restart=no <container_name_or_id>
+```
+
 This will automatically pull/build the necessary images and start all three services with their dependencies in the correct order.
