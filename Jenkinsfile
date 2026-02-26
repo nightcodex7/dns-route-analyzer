@@ -45,9 +45,7 @@ pipeline {
         stage("Docker Scout Security Scan") {
             steps {
                 sh """
-                    docker scout quickview $DOCKER_REPO:backend-$IMAGE_TAG
-                    docker scout quickview $DOCKER_REPO:ai-agent-$IMAGE_TAG
-                    docker scout quickview $DOCKER_REPO:frontend-$IMAGE_TAG
+                    docker scout quickview $DOCKER_REPO
                 """
             }
         }
@@ -55,7 +53,7 @@ pipeline {
         stage("Docker Scout CVE Report") {
             steps {
                 sh """
-                    docker scout cves $DOCKER_REPO:backend-$IMAGE_TAG --exit-code
+                    docker scout cves $DOCKER_REPO
                 """
             }
         }
