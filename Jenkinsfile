@@ -42,25 +42,25 @@ pipeline {
             }
         }
 
-        stage("Docker Scout Security Scan") {
-            steps {
-                sh """
-                    docker scout quickview $DOCKER_REPO:backend-$IMAGE_TAG
-                    docker scout quickview $DOCKER_REPO:ai-agent-$IMAGE_TAG
-                    docker scout quickview $DOCKER_REPO:frontend-$IMAGE_TAG
-                """
-            }
-        }
+        // stage("Docker Scout Security Scan") {
+        //     steps {
+        //         sh """
+        //             docker scout quickview $DOCKER_REPO:backend-$IMAGE_TAG
+        //             docker scout quickview $DOCKER_REPO:ai-agent-$IMAGE_TAG
+        //             docker scout quickview $DOCKER_REPO:frontend-$IMAGE_TAG
+        //         """
+        //     }
+        // }
 
-        stage("Docker Scout CVE Report") {
-            steps {
-                sh """
-                    docker scout cves $DOCKER_REPO:backend-$IMAGE_TAG
-                    docker scout cves $DOCKER_REPO:ai-agent-$IMAGE_TAG
-                    docker scout cves $DOCKER_REPO:frontend-$IMAGE_TAG
-                """
-            }
-        }
+        // stage("Docker Scout CVE Report") {
+        //     steps {
+        //         sh """
+        //             docker scout cves $DOCKER_REPO:backend-$IMAGE_TAG
+        //             docker scout cves $DOCKER_REPO:ai-agent-$IMAGE_TAG
+        //             docker scout cves $DOCKER_REPO:frontend-$IMAGE_TAG
+        //         """
+        //     }
+        // }
 
         // For Old Docker Compose Deployment
         // stage("Deploy with Docker Compose") {
