@@ -32,8 +32,15 @@ docker-compose up
 
 To check and stop swarm containers:
 ```bash
-docker service ls
+docker ps
 docker update --restart=no <container_name_or_id>
+docker service ls 
+docker service rm <service_id>
+```
+To stop the application:
+
+```bash
+docker-compose down
 ```
 
 This will automatically pull/build the necessary images and start all three services with their dependencies in the correct order.
